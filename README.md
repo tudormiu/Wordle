@@ -1,0 +1,2 @@
+# Wordle
+Proiect wordle cracker
