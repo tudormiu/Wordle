@@ -1,11 +1,10 @@
 #def entropia ():
 
+with open("cuvinte_wordle.txt") as f_cuvinte:
+    lista_cuvinte= list(f_cuvinte)
 
+lista_modele=[]
 
-f.cuvinte= open("cuvinte_wordle.txt", 'r')
-f.modele=open("lista_modele.txt", 'r')
-
-lista_cuvinte= list(f.cuvinte)
-lista_modele=list(f.modele)
-
-
+with open("lista_modele.txt") as f_modele:
+    for line in f_modele:
+        lista_modele.append(int(line.rstrip()))
