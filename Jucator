@@ -1,0 +1,11 @@
+#def entropia ():
+
+
+
+f.cuvinte= open("cuvinte_wordle.txt", 'r')
+f.modele=open("lista_modele.txt", 'r')
+
+lista_cuvinte= list(f.cuvinte)
+lista_modele=list(f.modele)
+
+
