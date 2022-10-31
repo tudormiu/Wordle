@@ -19,7 +19,7 @@ Config.set('graphics', 'resizable', 0)
 
 # Change background color
 Window.clearcolor = (0.1, 0.1, 0.1, 1)
-Window.size = (1500, 1000)
+Window.size = (1000, 750)
 
 
 class LetterState(Enum):
@@ -100,7 +100,7 @@ class GuessList(AnchorLayout):
     def __init__(self, word_list, word: str, **kwargs):
         super(GuessList, self).__init__(**kwargs)
         self.word_list = [word[0:5] for word in word_list]
-        self.box_layout = BoxLayout(orientation='vertical', size=(1040, 1460), size_hint=(None, None), spacing=10)
+        self.box_layout = BoxLayout(orientation='vertical', size=(520, 730), size_hint=(None, None), spacing=5)
         self.box_layout.add_widget(InputBox())
         for i in range(6):
             guess = GuessLine()
@@ -116,7 +116,7 @@ class GuessList(AnchorLayout):
 
     def process_model(self, model: str):
         if model == "22222":
-            win_label = Label(font_size=100, size=(1040, 200), size_hint=(None, None), color=(0, 0, 0, 0), text=f"GUESSES: {self.current_guess}")
+            win_label = Label(font_size=50, size=(520, 730), size_hint=(None, None), color=(0, 0, 0, 0), text=f"GUESSES: {self.current_guess}")
             self.box_layout.add_widget(win_label)
             Animation(color=(1, 1, 1, 1)).start(win_label)
 
