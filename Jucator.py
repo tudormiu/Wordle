@@ -1,6 +1,6 @@
 def check(cuvant, model, candidat):
     poz = 4
-    while model:
+    for i in range (5):
         ult = model % 10
         if (ult == 0 and candidat.find(cuvant[poz]) != -1) or \
                 (ult == 1 and candidat.find(cuvant[poz], 0, poz) == -1 and candidat.find(cuvant[poz], poz + 1) == -1) or \
