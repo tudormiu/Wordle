@@ -1,0 +1,53 @@
+<LetterBox>
+    disabled: True
+    background_normal: ''
+    background_disabled_normal: ''
+    background_color: 0.2, 0.2, 0.2, 0
+    font_size: 100
+    size: 200, 200
+    size_hint: None, None
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 0.5)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: 0.1, 0.1, 0.1, 1
+        Rectangle:
+            size: self.width - 10, self.height - 10
+            pos: int(self.center_x - (self.width - 10)/2.), int(self.center_y - (self.height - 10)/2.)
+
+<InputBox>
+    padding: 5
+    size: 1040, 200
+    size_hint: None, None
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 0.5)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    TextInput:
+        background_color: (0.1, 0.1, 0.1, 1)
+        font_size: 100
+        foreground_color: (1, 1, 1, 1)
+        halign: 'center'
+        padding: (0, 35, 0, 0)
+        multiline: False
+        text_validate_unfocus: False
+        on_text:
+            if len(self.text.strip()) > 5: self.text = self.text[0:5]
+            self.text = ''.join([i for i in self.text if i.isalpha()])
+            self.text = self.text.upper()
+        on_text_validate: self.parent.on_submit(self)
+
+<GuessLine>
+    spacing: 10
+    height: 200
+    size_hint: None, None
+
+<GuessList>
+    anchor_x: 'center'
+    anchor_y: 'center'
+    size_hint: 1, 1
