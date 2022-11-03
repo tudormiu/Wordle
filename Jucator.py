@@ -1,4 +1,5 @@
-def base3base10 (intrare):
+import copy
+def base3base10(intrare):
     pow = 1
     rez = 0
     while intrare:
@@ -43,8 +44,43 @@ def expected_value(candidat, numar_cuvinte):
     return s
 
 
+def play():
+    lungime = len(lista_cuvinte)
+
+    max = 0
+    i = 1
+
+    # for cuv in lista_cuvinte:
+    #    if expected_value(cuv, lungime) > max:
+    #        max = expected_value(cuv, lungime)
+    #        first_guess= cuv
+    #    print(round(i/11454, 2)*100 , '%')
+    #    i += 1
+    # print (first_guess)
+    # print (max)
+
+    ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului 'TAREI':"))
+    ultimul_guess = 'TAREI\n'
+
+    while ultimul_model != int(22222):
+        lungime_cuvinte = len(lista_cuvinte)
+        for i in range(lungime_cuvinte - 1, 0, -1):
+            if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
+                junk = lista_cuvinte.pop(i)
+        max = 0
+        for nou_candidat in lista_candidati:
+            if expected_value(nou_candidat, lungime_cuvinte) > max:
+                max = expected_value(nou_candidat, lungime_cuvinte)
+                ultimul_guess = nou_candidat
+        print(ultimul_guess)
+        ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
+
+
+
 with open("cuvinte_wordle.txt") as f_cuvinte:
     lista_cuvinte = list(f_cuvinte)
+from copy import deepcopy
+lista_candidati = copy.deepcopy(lista_cuvinte)
 
 lista_modele = []
 
@@ -52,16 +88,4 @@ with open("lista_modele.txt") as f_modele:
     for line in f_modele:
         lista_modele.append(int(line.rstrip()))
 
-lungime = len(lista_cuvinte)
-
-
-max=0
-i=1
-for cuv in lista_cuvinte:
-    if expected_value(cuv, lungime) > max:
-        max = expected_value(cuv, lungime)
-        first_guess= cuv
-    print(round(i/11454, 2)*100 , '%')
-    i += 1
-print (first_guess)
-print (max)
+play()
