@@ -1,3 +1,6 @@
+import string
+from typing import Dict
+
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivy.uix.anchorlayout import AnchorLayout
@@ -23,10 +26,33 @@ Window.size = (1000, 750)
 
 
 class LetterState(Enum):
-    EMPTY = -1,
-    INCORRECT = 0,
-    PARTIAL = 1,
+    EMPTY = -1
+    INCORRECT = 0
+    PARTIAL = 1
     CORRECT = 2
+
+
+def get_model_from_word(word: str, right_word: str) -> str:
+    # Create letter dict
+    letter_frequencies: Dict[str, int] = {}
+    for letter in string.ascii_uppercase:
+        letter_frequencies[letter] = 0
+    # Calculate letter dict
+    for character in right_word:
+        letter_frequencies[character] += 1
+    # Create model
+    model: str = ""
+    for index in range(5):
+        # Check if right letter
+        if word[index] == right_word[index]:
+            model += str(LetterState.CORRECT.value)
+            letter_frequencies[word[index]] -= 1
+        elif letter_frequencies[word[index]] > 0:
+            model += str(LetterState.PARTIAL.value)
+            letter_frequencies[word[index]] -= 1
+        else:
+            model += str(LetterState.INCORRECT.value)
+    return model
 
 
 class LetterBox(Button):
@@ -128,29 +154,18 @@ class InputBox(BoxLayout):
         text = text_input.text
         guess_widget: GuessList = self.parent.parent
         if len(text) < 5 or text_input.text not in guess_widget.word_list:
+            # Start incorrect guess animation and exit
             anim = Animation(background_color=(0.6, 0, 0, 1), duration=0.1) + Animation(background_color=(0.1, 0.1, 0.1, 1), duration=0.1)
             anim.start(text_input)
             return
+        # If the current guess is greater than 5, just return the last line
         guess: GuessLine = guess_widget.guess_list[min(5, guess_widget.current_guess)]
-        return_model = ""
+        model = get_model_from_word(text, guess_widget.correct_word)
         for i in range(5):
             current_letter = guess.letters[i]
-            current_letter.color = (1, 1, 1, 3)
-            state = LetterState.EMPTY
-            # Check if correct letter
-            if text[i] == guess_widget.correct_word[i]:
-                state = LetterState.CORRECT
-                return_model += "2"
-            # Check if incorrect letter
-            elif guess_widget.correct_word.find(text[i]) == -1:
-                state = LetterState.INCORRECT
-                return_model += "0"
-            else:
-                return_model += "1"
-                state = LetterState.PARTIAL
-            current_letter.update_box(text[i], state)
+            current_letter.update_box(text[i], LetterState(int(model[i])))
         guess_widget.current_guess += 1
-        if guess_widget.current_guess >= 6 and return_model != "22222":
+        if guess_widget.current_guess >= 6 and model != "22222":
             # If we used all guesses, move all of them up by 1 line to make space for the new guess
             for line in range(1, 6):
                 original_guess: GuessLine = guess_widget.guess_list[line]
@@ -162,9 +177,9 @@ class InputBox(BoxLayout):
             for i in range(5):
                 guess_widget.guess_list[5].letters[i].update_box("", LetterState.EMPTY)
         text_input.text = ""
-        if return_model == "22222":
+        if model == "22222":
             self.parent.remove_widget(self)
-        guess_widget.process_model(return_model)
+        guess_widget.process_model(model)
 
 
 
