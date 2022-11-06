@@ -70,8 +70,8 @@ def aproximare_guessuri_ramase(biti_incertitudine):
     return guessuri_ramase
 
 
-def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta):
-    exp_score = numar_incercare * ev * constanta + (1 - ev)*(numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa-ev))
+def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta, lungime_cuvinte):
+    exp_score = numar_incercare * constanta/lungime_cuvinte + (1 - (constanta/lungime_cuvinte))*(numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa-ev))
     return exp_score
 
 
@@ -106,22 +106,24 @@ def play():
 
         lungime_cuvinte = len(lista_cuvinte)
 
-        max = 0
+        max = 50
         entropie_ramasa = entropie_lista(lungime_cuvinte)
 
         for nou_candidat in lista_candidati:
+
             ev = expected_value(nou_candidat, lungime_cuvinte)
             ct_num = nou_candidat in lista_cuvinte
 
             '''if expected_value(nou_candidat, lungime_cuvinte) > max:
                             max = expected_value(nou_candidat, lungime_cuvinte)'''
-            if expected_score(numar_incercare, ev, entropie_ramasa, ct_num) > max:
-                max = expected_score(numar_incercare, ev, entropie_ramasa, ct_num)
+            scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
+            if scor_asteptat < max and scor_asteptat != 0:
+                max = scor_asteptat
                 ultimul_guess = nou_candidat
 
         print(lista_cuvinte)
         print('')
-        print(ultimul_guess)
+        print(ultimul_guess, max)
         ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
 
 
