@@ -33,32 +33,16 @@ class LetterState(Enum):
 
 
 def get_model_from_word(word: str, right_word: str) -> str:
-    # Create letter dict
-    letter_frequencies: Dict[str, int] = {}
-    for letter in string.ascii_uppercase:
-        letter_frequencies[letter] = 0
-    # Calculate letter dict
-    for character in right_word:
-        letter_frequencies[character] += 1
-    # Create model
-    model: List[LetterState] = [LetterState.EMPTY] * 5
+    model: str = ""
     for index in range(5):
         # Check if right letter
         if word[index] == right_word[index]:
-            model[index] = LetterState.CORRECT
-            letter_frequencies[word[index]] -= 1
-    for index in range(5):
-        # If correct letter, skip
-        if model[index] != LetterState.EMPTY:
-            continue
-        # Check if right letter on incorrect position
-        if letter_frequencies[word[index]] > 0:
-            model[index] = LetterState.PARTIAL
-            letter_frequencies[word[index]] -= 1
+            model += str(LetterState.CORRECT.value)
+        elif word[index] in right_word:
+            model += str(LetterState.PARTIAL.value)
         else:
-            # Letter not in word anymore
-            model[index] = LetterState.INCORRECT
-    return ''.join([str(state.value) for state in model])
+            model += str(LetterState.INCORRECT.value)
+    return model
 
 
 class LetterBox(Button):
@@ -148,7 +132,7 @@ class GuessList(AnchorLayout):
 
     def process_model(self, model: str):
         if model == "22222":
-            win_label = Label(font_size=50, size=(520, 730), size_hint=(None, None), color=(0, 0, 0, 0), text=f"GUESSES: {self.current_guess}")
+            win_label = Label(font_size=50, size=(520, 100), size_hint=(None, None), color=(0, 0, 0, 0), text=f"GUESSES: {self.current_guess}")
             self.box_layout.add_widget(win_label)
             Animation(color=(1, 1, 1, 1)).start(win_label)
 
@@ -203,5 +187,4 @@ class WordleApp(App):
 if __name__ == "__main__":
     with open("cuvinte_wordle.txt") as f_cuvinte:
         word_list = list(f_cuvinte)
-    app = WordleApp(word_list, word_list[random.randint(0, len(word_list))][0:5])
-    app.run()
+    WordleApp(word_list, word_list[random.randint(0, len(word_list))][0:5]).run()
