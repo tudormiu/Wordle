@@ -1,5 +1,12 @@
+import os
 import string
+from argparse import ArgumentParser, Namespace
 from typing import Dict, List
+import re
+import random
+from enum import Enum
+
+os.environ['KIVY_NO_ARGS'] = "1"
 
 from kivy.app import App
 from kivy.properties import StringProperty
@@ -13,10 +20,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.animation import Animation
-import re
-import random
-
-from enum import Enum
 
 Config.set('graphics', 'resizable', 0)
 
@@ -185,6 +188,21 @@ class WordleApp(App):
 
 
 if __name__ == "__main__":
+    parser: ArgumentParser = ArgumentParser(
+        prog="Wordle",
+        description="Wordle Game & Solver",
+        epilog="Made by Deaconescu Mario, Miu Tudor, and Berbece David"
+    )
+    parser.add_argument("-m", "--manual")
+    parser.add_argument("-d", "--debug", action='store_true')
+    args: Namespace = parser.parse_args()
     with open("cuvinte_wordle.txt") as f_cuvinte:
         word_list = list(f_cuvinte)
-    WordleApp(word_list, word_list[random.randint(0, len(word_list))][0:5]).run()
+    correct_word: str
+    if args.manual:
+        correct_word = args.manual.upper()
+    else:
+        correct_word = word_list[random.randint(0, len(word_list))][0:5]
+    if args.debug:
+        print(f'Correct word: {correct_word}')
+    WordleApp(word_list, correct_word).run()
