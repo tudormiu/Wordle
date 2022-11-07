@@ -1,5 +1,5 @@
 import string
-from typing import Dict
+from typing import Dict, List
 
 from kivy.app import App
 from kivy.properties import StringProperty
@@ -41,18 +41,24 @@ def get_model_from_word(word: str, right_word: str) -> str:
     for character in right_word:
         letter_frequencies[character] += 1
     # Create model
-    model: str = ""
+    model: List[LetterState] = [LetterState.EMPTY] * 5
     for index in range(5):
         # Check if right letter
         if word[index] == right_word[index]:
-            model += str(LetterState.CORRECT.value)
+            model[index] = LetterState.CORRECT
             letter_frequencies[word[index]] -= 1
-        elif letter_frequencies[word[index]] > 0:
-            model += str(LetterState.PARTIAL.value)
+    for index in range(5):
+        # If correct letter, skip
+        if model[index] != LetterState.EMPTY:
+            continue
+        # Check if right letter on incorrect position
+        if letter_frequencies[word[index]] > 0:
+            model[index] = LetterState.PARTIAL
             letter_frequencies[word[index]] -= 1
         else:
-            model += str(LetterState.INCORRECT.value)
-    return model
+            # Letter not in word anymore
+            model[index] = LetterState.INCORRECT
+    return ''.join([str(state.value) for state in model])
 
 
 class LetterBox(Button):
