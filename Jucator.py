@@ -153,48 +153,35 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
         else:
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
 
-# def calculate_second_word():
-#
-#     results: Dict[int, str] = {}
-#
-#     global lista_cuvinte
-#
-#     for current_model in lista_modele:
-#
-#         cuvinte_temp = lista_cuvinte.copy()
-#         ultimul_model: int = current_model
-#
-#         ultimul_guess = 'TAREI\n'
-#         numar_incercare = 1
-#
-#         numar_incercare += 1
-#         lungime_cuvinte = len(lista_cuvinte)
-#
-#         for i in range(lungime_cuvinte - 1, -1, -1):
-#             if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
-#                 lista_cuvinte.pop(i)
-#
-#         lungime_cuvinte = len(lista_cuvinte)
-#
-#         max = 50
-#         entropie_ramasa = entropie_lista(lungime_cuvinte)
-#
-#         for nou_candidat in lista_candidati:
-#             ev = expected_value(nou_candidat, lungime_cuvinte)
-#             ct_num = nou_candidat in lista_cuvinte
-#
-#             '''if expected_value(nou_candidat, lungime_cuvinte) > max:
-#                             max = expected_value(nou_candidat, lungime_cuvinte)'''
-#             scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
-#             if scor_asteptat < max and scor_asteptat != 0:
-#                 max = scor_asteptat
-#                 ultimul_guess = nou_candidat
-#
-#         results[current_model] = ultimul_guess
-#         lista_cuvinte = cuvinte_temp.copy()
-#         print(current_model, ultimul_guess)
-#
-#     print(results)
+def calculate_second_word():
+
+     lista_rezultate = []
+
+     for current_model in lista_modele:
+
+         cuvinte_temp = copy.deepcopy(lista_cuvinte)
+         ultimul_model: int = current_model
+
+         ultimul_guess = 'TAREI\n'
+
+         for i in range(243):
+             if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
+                 lista_cuvinte.pop(i)
+         lungime_cuvinte = len(lista_cuvinte)
+         max = 0
+
+         for nou_candidat in lista_candidati:
+             ev = expected_value(nou_candidat, lungime_cuvinte)
+             ct_num = nou_candidat in lista_cuvinte
+
+             if expected_value(nou_candidat, lungime_cuvinte) > max:
+                 max = expected_value(nou_candidat, lungime_cuvinte)
+                 ultimul_guess = nou_candidat
+
+         lista_rezultate.append(ultimul_guess)
+         print(current_model, ultimul_guess)
+
+     print(lista_rezultate)
 
 if __name__ == "__main__":
     with open("cuvinte_wordle.txt") as f_cuvinte:
@@ -203,9 +190,15 @@ if __name__ == "__main__":
     lista_candidati = copy.deepcopy(lista_cuvinte)
 
     lista_modele = []
+    lista_second_guesses = []
 
     with open("lista_modele.txt") as f_modele:
         for line in f_modele:
             lista_modele.append(int(line.rstrip()))
 
+    with open("lista_second_guesses.txt") as lista_guesses:
+        for line in lista_guesses:
+            lista_second_guesses.append(line.rstrip())
+
     play()
+    #calculate_second_word()
