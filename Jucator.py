@@ -1,6 +1,6 @@
 import copy
 from multiprocessing.dummy.connection import Connection
-from typing import List, Dict
+from typing import List
 
 
 def base3base10(intrare):
@@ -119,6 +119,31 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
     ultimul_guess = 'TAREI\n'
     numar_incercare = 1
 
+    if ultimul_model != int(22222):
+        lungime_cuvinte = len(lista_cuvinte)
+        for i in range(lungime_cuvinte - 1, -1, -1):
+            if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
+                lista_cuvinte.pop(i)
+
+        lista_second_guesses = []
+        with open("lista_second_guesses.txt") as lista_guesses:
+            for line in lista_guesses:
+                lista_second_guesses.append(line.rstrip())
+
+        print(ultimul_model)
+
+        pozitie_in_lista = base3base10(ultimul_model)
+        ultimul_guess = lista_second_guesses[pozitie_in_lista]
+
+        print(lista_cuvinte)
+        print('')
+        print(ultimul_guess)
+        if connection:
+            connection.send(ultimul_guess[0:5])
+            ultimul_model = int(connection.recv())
+        else:
+            ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
+
     while ultimul_model != int(22222):
         numar_incercare += 1
         lungime_cuvinte = len(lista_cuvinte)
@@ -129,24 +154,26 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
 
         lungime_cuvinte = len(lista_cuvinte)
 
-        min = 50
-        #max = 0
-        entropie_ramasa = entropie_lista(lungime_cuvinte)
+        #min = 50
+        max = 0
+        #entropie_ramasa = entropie_lista(lungime_cuvinte)
 
         for nou_candidat in lista_candidati:
             ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte)
-            ct_num = nou_candidat in lista_cuvinte
-            '''if ev > max:
-                max = ev'''
-            scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
-            if scor_asteptat < min and scor_asteptat != 0:
-                min = scor_asteptat
+            #ct_num = nou_candidat in lista_cuvinte
+            if ev > max:
+                max = ev
+                '''scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
+                if scor_asteptat < min and scor_asteptat != 0:
+                    min = scor_asteptat'''
+                ultimul_guess = nou_candidat
+            elif ev == max and nou_candidat in lista_cuvinte:
                 ultimul_guess = nou_candidat
 
         print(lista_cuvinte)
         print('')
-        print(ultimul_guess, min)
-        #print(ultimul_guess, max)
+        #print(ultimul_guess, min)
+        print(ultimul_guess, max)
         if connection:
             connection.send(ultimul_guess[0:5])
             ultimul_model = int(connection.recv())
@@ -154,7 +181,6 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
 
 def calculate_second_word():
-
     lista_rezultate = []
     with open("cuvinte_wordle.txt") as f_cuvinte:
         lista_candidati = list(f_cuvinte)
@@ -197,15 +223,11 @@ if __name__ == "__main__":
     lista_candidati = copy.deepcopy(lista_cuvinte)
 
     lista_modele = []
-    lista_second_guesses = []
+
 
     with open("lista_modele.txt") as f_modele:
         for line in f_modele:
             lista_modele.append(int(line.rstrip()))
-
-    with open("lista_second_guesses.txt") as lista_guesses:
-        for line in lista_guesses:
-            lista_second_guesses.append(line.rstrip())
 
     play()
     #calculate_second_word()
