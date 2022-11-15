@@ -46,13 +46,13 @@ def pattern(candidat, cuvant):
     return pat
 
 
-def expected_value(candidat, numar_cuvinte):
+def expected_value(candidat, numar_cuvinte, lista_cuvinte_ev):
     s = 0
     frecventa = [0] * 243
 
     import math
 
-    for cuvant in lista_cuvinte:
+    for cuvant in lista_cuvinte_ev:
         frecventa[pattern(candidat, cuvant)] += 1
 
     for ct in frecventa:
@@ -129,24 +129,24 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
 
         lungime_cuvinte = len(lista_cuvinte)
 
-        max = 50
+        min = 50
+        #max = 0
         entropie_ramasa = entropie_lista(lungime_cuvinte)
 
         for nou_candidat in lista_candidati:
-
-            ev = expected_value(nou_candidat, lungime_cuvinte)
+            ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte)
             ct_num = nou_candidat in lista_cuvinte
-
-            '''if expected_value(nou_candidat, lungime_cuvinte) > max:
-                            max = expected_value(nou_candidat, lungime_cuvinte)'''
+            '''if ev > max:
+                max = ev'''
             scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
-            if scor_asteptat < max and scor_asteptat != 0:
-                max = scor_asteptat
+            if scor_asteptat < min and scor_asteptat != 0:
+                min = scor_asteptat
                 ultimul_guess = nou_candidat
 
         print(lista_cuvinte)
         print('')
-        print(ultimul_guess, max)
+        print(ultimul_guess, min)
+        #print(ultimul_guess, max)
         if connection:
             connection.send(ultimul_guess[0:5])
             ultimul_model = int(connection.recv())
@@ -155,33 +155,40 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
 
 def calculate_second_word():
 
-     lista_rezultate = []
+    lista_rezultate = []
+    with open("cuvinte_wordle.txt") as f_cuvinte:
+        lista_candidati = list(f_cuvinte)
+    for current_model in lista_modele:
 
-     for current_model in lista_modele:
+        lista_cuvinte_second_guess = copy.deepcopy(lista_candidati)
+        ultimul_guess = 'TAREI\n'
+        lungime_cuvinte = len(lista_cuvinte_second_guess)
 
-         cuvinte_temp = copy.deepcopy(lista_cuvinte)
-         ultimul_model: int = current_model
+        for i in range(lungime_cuvinte - 1, -1, -1):
+            if check(lista_cuvinte_second_guess[i], current_model, ultimul_guess) == 0:
+                lista_cuvinte_second_guess.pop(i)
+        lungime_cuvinte = len(lista_cuvinte_second_guess)
+        print(current_model, 'done', lungime_cuvinte)
+        max = 0
 
-         ultimul_guess = 'TAREI\n'
+        print (lista_cuvinte_second_guess)
 
-         for i in range(243):
-             if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
-                 lista_cuvinte.pop(i)
-         lungime_cuvinte = len(lista_cuvinte)
-         max = 0
+        for nou_candidat in lista_candidati:
+            ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte_second_guess)
+            if ev > max:
+                max = ev
+                ultimul_guess = nou_candidat
+            elif ev == max and nou_candidat in lista_cuvinte_second_guess:
+                ultimul_guess = nou_candidat
 
-         for nou_candidat in lista_candidati:
-             ev = expected_value(nou_candidat, lungime_cuvinte)
-             ct_num = nou_candidat in lista_cuvinte
 
-             if expected_value(nou_candidat, lungime_cuvinte) > max:
-                 max = expected_value(nou_candidat, lungime_cuvinte)
-                 ultimul_guess = nou_candidat
+        lista_rezultate.append(ultimul_guess)
+        print(current_model, ultimul_guess)
 
-         lista_rezultate.append(ultimul_guess)
-         print(current_model, ultimul_guess)
-
-     print(lista_rezultate)
+    lista_second_guesses = open("lista_second_guesses.txt", "a")
+    for i in range (243):
+        lista_second_guesses.write(lista_rezultate[i])
+    lista_second_guesses.close()
 
 if __name__ == "__main__":
     with open("cuvinte_wordle.txt") as f_cuvinte:
