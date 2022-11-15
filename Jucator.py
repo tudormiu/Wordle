@@ -1,4 +1,6 @@
 import copy
+from multiprocessing.dummy.connection import Connection
+from typing import List, Dict
 
 
 def base3base10(intrare):
@@ -36,7 +38,8 @@ def pattern(candidat, cuvant):
     for poz in [4, 3, 2, 1, 0]:
         if candidat[poz] == cuvant[poz]:
             pat += putere * 2
-        if candidat[poz] != cuvant[poz] and (cuvant.find(candidat[poz]) != -1 or cuvant.find(candidat[poz], poz + 1, 5) != -1):
+        if candidat[poz] != cuvant[poz] and (
+                cuvant.find(candidat[poz]) != -1 or cuvant.find(candidat[poz], poz + 1, 5) != -1):
             pat += putere
         putere *= 3
 
@@ -45,7 +48,7 @@ def pattern(candidat, cuvant):
 
 def expected_value(candidat, numar_cuvinte):
     s = 0
-    frecventa = [0]*243
+    frecventa = [0] * 243
 
     import math
 
@@ -66,12 +69,13 @@ def aproximare_guessuri_ramase(biti_incertitudine):
     (stiind ca e eronat) ca distributia lor e liniara, aproximand o constanta de 5.2 ca fiind raportul dinte
     incertitudinea ramasa si numarul necesar de guessuri, peste ultimul guess, necesar'''
 
-    guessuri_ramase = 1 + biti_incertitudine/5.20
+    guessuri_ramase = 1 + biti_incertitudine / 5.20
     return guessuri_ramase
 
 
 def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta, lungime_cuvinte):
-    exp_score = numar_incercare * constanta/lungime_cuvinte + (1 - (constanta/lungime_cuvinte))*(numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa-ev))
+    exp_score = numar_incercare * constanta / lungime_cuvinte + (1 - (constanta / lungime_cuvinte)) * (
+                numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa - ev))
     return exp_score
 
 
@@ -80,8 +84,7 @@ def entropie_lista(lungime_lista_cuvinte):
     return math.log2(lungime_lista_cuvinte)
 
 
-def play():
-
+def play(cuvinte: List[str] = None, connection: Connection = None):
     # lungime = len(lista_cuvinte)
     # for cuv in lista_cuvinte:
     #    if expected_value(cuv, lungime) > max:
@@ -92,7 +95,27 @@ def play():
     # print (first_guess)
     # print (max)
 
-    ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului 'TAREI':"))
+    if cuvinte:
+        global lista_cuvinte
+        lista_cuvinte = cuvinte
+        global lista_candidati
+        lista_candidati = copy.deepcopy(lista_cuvinte)
+
+        global lista_modele
+        lista_modele = []
+
+        with open("lista_modele.txt") as f_modele:
+            for line in f_modele:
+                lista_modele.append(int(line.rstrip()))
+
+    ultimul_model: int
+
+    if connection:
+        connection.send('TAREI')
+        ultimul_model = int(connection.recv())
+    else:
+        ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului 'TAREI':"))
+
     ultimul_guess = 'TAREI\n'
     numar_incercare = 1
 
@@ -124,18 +147,65 @@ def play():
         print(lista_cuvinte)
         print('')
         print(ultimul_guess, max)
-        ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
+        if connection:
+            connection.send(ultimul_guess[0:5])
+            ultimul_model = int(connection.recv())
+        else:
+            ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
 
+# def calculate_second_word():
+#
+#     results: Dict[int, str] = {}
+#
+#     global lista_cuvinte
+#
+#     for current_model in lista_modele:
+#
+#         cuvinte_temp = lista_cuvinte.copy()
+#         ultimul_model: int = current_model
+#
+#         ultimul_guess = 'TAREI\n'
+#         numar_incercare = 1
+#
+#         numar_incercare += 1
+#         lungime_cuvinte = len(lista_cuvinte)
+#
+#         for i in range(lungime_cuvinte - 1, -1, -1):
+#             if check(lista_cuvinte[i], ultimul_model, ultimul_guess) == 0:
+#                 lista_cuvinte.pop(i)
+#
+#         lungime_cuvinte = len(lista_cuvinte)
+#
+#         max = 50
+#         entropie_ramasa = entropie_lista(lungime_cuvinte)
+#
+#         for nou_candidat in lista_candidati:
+#             ev = expected_value(nou_candidat, lungime_cuvinte)
+#             ct_num = nou_candidat in lista_cuvinte
+#
+#             '''if expected_value(nou_candidat, lungime_cuvinte) > max:
+#                             max = expected_value(nou_candidat, lungime_cuvinte)'''
+#             scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
+#             if scor_asteptat < max and scor_asteptat != 0:
+#                 max = scor_asteptat
+#                 ultimul_guess = nou_candidat
+#
+#         results[current_model] = ultimul_guess
+#         lista_cuvinte = cuvinte_temp.copy()
+#         print(current_model, ultimul_guess)
+#
+#     print(results)
 
-with open("cuvinte_wordle.txt") as f_cuvinte:
-    lista_cuvinte = list(f_cuvinte)
+if __name__ == "__main__":
+    with open("cuvinte_wordle.txt") as f_cuvinte:
+        lista_cuvinte = list(f_cuvinte)
 
-lista_candidati = copy.deepcopy(lista_cuvinte)
+    lista_candidati = copy.deepcopy(lista_cuvinte)
 
-lista_modele = []
+    lista_modele = []
 
-with open("lista_modele.txt") as f_modele:
-    for line in f_modele:
-        lista_modele.append(int(line.rstrip()))
+    with open("lista_modele.txt") as f_modele:
+        for line in f_modele:
+            lista_modele.append(int(line.rstrip()))
 
-play()
+    play()

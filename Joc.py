@@ -1,10 +1,13 @@
 import os
 import string
 from argparse import ArgumentParser, Namespace
+from multiprocessing.connection import Connection
 from typing import Dict, List
 import re
 import random
 from enum import Enum
+
+from kivy.clock import Clock
 
 os.environ['KIVY_NO_ARGS'] = "1"
 
@@ -26,6 +29,8 @@ Config.set('graphics', 'resizable', 0)
 # Change background color
 Window.clearcolor = (0.1, 0.1, 0.1, 1)
 Window.size = (1000, 750)
+
+TICKS_PER_SECOND = 1000
 
 
 class LetterState(Enum):
@@ -49,7 +54,6 @@ def get_model_from_word(word: str, right_word: str) -> str:
 
 
 class LetterBox(Button):
-
     guess_state = LetterState.EMPTY
 
     def __init__(self, **kwargs):
@@ -97,8 +101,6 @@ class LetterBox(Button):
             self.set_empty()
 
 
-
-
 class GuessLine(BoxLayout):
     letters = list()
 
@@ -112,11 +114,13 @@ class GuessLine(BoxLayout):
 
 
 class GuessList(AnchorLayout):
-    guess_list = list()
-    current_guess = 0
+    guess_list: List[GuessLine] = list()
+    current_guess: int = 0
     correct_word: str
+    connection: Connection
+    current_model: str
 
-    def __init__(self, word_list, word: str, **kwargs):
+    def __init__(self, word_list: List[str], word: str, connection: Connection = None, **kwargs):
         super(GuessList, self).__init__(**kwargs)
         self.word_list = [word[0:5] for word in word_list]
         self.box_layout = BoxLayout(orientation='vertical', size=(520, 730), size_hint=(None, None), spacing=5)
@@ -127,6 +131,24 @@ class GuessList(AnchorLayout):
             self.box_layout.add_widget(guess)
         self.add_widget(self.box_layout)
         self.correct_word = word
+        self.connection = connection
+        if connection:
+            Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
+
+    def receive_data(self, dt):
+        if not self.connection.poll():
+            Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
+            return
+        next_guess: str = self.connection.recv()
+        input_box: InputBox = self.box_layout.children[len(self.box_layout.children) - 1]
+        text_input: TextInput = input_box.children[0]
+        text_input.text = next_guess
+        input_box.on_submit(text_input)
+
+    def send_data(self, dt):
+        self.connection.send(self.current_model)
+        if self.current_model != "22222":
+            Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
 
     def add_line(self):
         guess = GuessLine()
@@ -134,11 +156,14 @@ class GuessList(AnchorLayout):
         self.box_layout.add_widget(guess)
 
     def process_model(self, model: str):
+        self.current_model = model
         if model == "22222":
-            win_label = Label(font_size=50, size=(520, 100), size_hint=(None, None), color=(0, 0, 0, 0), text=f"GUESSES: {self.current_guess}")
+            win_label = Label(font_size=50, size=(520, 100), size_hint=(None, None), color=(0, 0, 0, 0),
+                              text=f"GUESSES: {self.current_guess}")
             self.box_layout.add_widget(win_label)
             Animation(color=(1, 1, 1, 1)).start(win_label)
-
+        if self.connection:
+            Clock.schedule_once(self.send_data, 1 / TICKS_PER_SECOND)
 
 
 class InputBox(BoxLayout):
@@ -148,7 +173,8 @@ class InputBox(BoxLayout):
         guess_widget: GuessList = self.parent.parent
         if len(text) < 5 or text_input.text not in guess_widget.word_list:
             # Start incorrect guess animation and exit
-            anim = Animation(background_color=(0.6, 0, 0, 1), duration=0.1) + Animation(background_color=(0.1, 0.1, 0.1, 1), duration=0.1)
+            anim = Animation(background_color=(0.6, 0, 0, 1), duration=0.1) + Animation(
+                background_color=(0.1, 0.1, 0.1, 1), duration=0.1)
             anim.start(text_input)
             return
         # If the current guess is greater than 5, just return the last line
@@ -175,16 +201,23 @@ class InputBox(BoxLayout):
         guess_widget.process_model(model)
 
 
-
 class WordleApp(App):
 
-    def __init__(self, word_list, word: str, **kwargs):
+    def __init__(self, word_list: List[str], word: str, connection: Connection = None, **kwargs):
         super(WordleApp, self).__init__(**kwargs)
+        self.connection = connection
         self.word_list = word_list
         self.word = word
 
     def build(self):
+        if self.connection:
+            return GuessList(self.word_list, self.word, connection=self.connection)
         return GuessList(self.word_list, self.word)
+
+
+def remote_start_app(word_list: List[str], connection: Connection):
+    app = WordleApp(word_list, word_list[random.randint(0, len(word_list))][0:5], connection=connection)
+    app.run()
 
 
 if __name__ == "__main__":
