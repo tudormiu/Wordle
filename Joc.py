@@ -7,9 +7,11 @@ import re
 import random
 from enum import Enum
 
-from kivy.clock import Clock
-
 os.environ['KIVY_NO_ARGS'] = "1"
+os.environ["KIVY_NO_CONSOLELOG"] = "1"
+
+from kivy import Logger
+Logger.disabled = True
 
 from kivy.app import App
 from kivy.properties import StringProperty
@@ -23,6 +25,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.animation import Animation
+from kivy.clock import Clock
 
 Config.set('graphics', 'resizable', 0)
 
@@ -149,6 +152,8 @@ class GuessList(AnchorLayout):
         self.connection.send(self.current_model)
         if self.current_model != "22222":
             Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
+        elif App.get_running_app().auto_quit:
+            App.get_running_app().stop()
 
     def add_line(self):
         guess = GuessLine()
@@ -203,11 +208,12 @@ class InputBox(BoxLayout):
 
 class WordleApp(App):
 
-    def __init__(self, word_list: List[str], word: str, connection: Connection = None, **kwargs):
+    def __init__(self, word_list: List[str], word: str, connection: Connection = None, auto_quit: bool = False, **kwargs):
         super(WordleApp, self).__init__(**kwargs)
         self.connection = connection
         self.word_list = word_list
         self.word = word
+        self.auto_quit = auto_quit
 
     def build(self):
         if self.connection:
@@ -217,6 +223,11 @@ class WordleApp(App):
 
 def remote_start_app(word_list: List[str], connection: Connection):
     app = WordleApp(word_list, word_list[random.randint(0, len(word_list))][0:5], connection=connection)
+    app.run()
+
+
+def remote_start_app_with_word(word_list: List[str], word: str, connection: Connection):
+    app = WordleApp(word_list, word, connection=connection, auto_quit=True)
     app.run()
 
 

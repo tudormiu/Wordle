@@ -179,6 +179,8 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
             ultimul_model = int(connection.recv())
         else:
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
+    if connection:
+        connection.send(numar_incercare)
 
 def calculate_second_word():
     lista_rezultate = []
