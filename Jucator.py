@@ -84,7 +84,7 @@ def entropie_lista(lungime_lista_cuvinte):
     return math.log2(lungime_lista_cuvinte)
 
 
-def play(cuvinte: List[str] = None, connection: Connection = None):
+def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = True):
     # lungime = len(lista_cuvinte)
     # for cuv in lista_cuvinte:
     #    if expected_value(cuv, lungime) > max:
@@ -130,14 +130,16 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
             for line in lista_guesses:
                 lista_second_guesses.append(line.rstrip())
 
-        print(ultimul_model)
+        if log:
+            print(ultimul_model)
 
         pozitie_in_lista = base3base10(ultimul_model)
         ultimul_guess = lista_second_guesses[pozitie_in_lista]
 
-        print(lista_cuvinte)
-        print('')
-        print(ultimul_guess)
+        if log:
+            print(lista_cuvinte)
+            print('')
+            print(ultimul_guess)
         if connection:
             connection.send(ultimul_guess[0:5])
             ultimul_model = int(connection.recv())
@@ -170,17 +172,15 @@ def play(cuvinte: List[str] = None, connection: Connection = None):
             elif ev == max and nou_candidat in lista_cuvinte:
                 ultimul_guess = nou_candidat
 
-        print(lista_cuvinte)
-        print('')
-        #print(ultimul_guess, min)
-        print(ultimul_guess, max)
+        if log:
+            print(lista_cuvinte)
+            print('')
+            print(ultimul_guess, max)
         if connection:
             connection.send(ultimul_guess[0:5])
             ultimul_model = int(connection.recv())
         else:
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
-    if connection:
-        connection.send(numar_incercare)
 
 def calculate_second_word():
     lista_rezultate = []
