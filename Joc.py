@@ -34,6 +34,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)
 Window.size = (1000, 750)
 
 TICKS_PER_SECOND = 10000
+TIMEOUT = 5
 
 
 class LetterState(Enum):
@@ -122,6 +123,7 @@ class GuessList(AnchorLayout):
     correct_word_index: str
     connection: Connection
     current_model: str
+    pipe_wait_time = 0
 
     def __init__(self, word_list: List[str], word_index: int, connection: Connection = None, **kwargs):
         super(GuessList, self).__init__(**kwargs)
@@ -139,9 +141,13 @@ class GuessList(AnchorLayout):
             Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
 
     def receive_data(self, dt):
+        self.pipe_wait_time += dt
+        if self.pipe_wait_time >= TIMEOUT:
+            App.get_running_app().stop()
         if not self.connection.poll():
             Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
             return
+        self.pipe_wait_time = 0
         next_guess: str = self.connection.recv()
         input_box: InputBox = self.box_layout.children[len(self.box_layout.children) - 1]
         text_input: TextInput = input_box.children[0]
@@ -154,7 +160,7 @@ class GuessList(AnchorLayout):
             Clock.schedule_once(self.receive_data, 1 / TICKS_PER_SECOND)
         else:
             app: WordleApp = App.get_running_app()
-            if app.calculate_all:
+            if app.auto_quit:
                 app.restart()
 
     def add_line(self):
@@ -164,7 +170,7 @@ class GuessList(AnchorLayout):
 
     def process_model(self, model: str):
         self.current_model = model
-        if model == "22222" and not App.get_running_app().calculate_all:
+        if model == "22222" and not App.get_running_app().calculate_step:
             win_label = Label(font_size=50, size=(520, 100), size_hint=(None, None), color=(0, 0, 0, 0),
                               text=f"GUESSES: {self.current_guess}")
             self.box_layout.add_widget(win_label)
@@ -203,7 +209,7 @@ class InputBox(BoxLayout):
             for i in range(5):
                 guess_widget.guess_list[5].letters[i].update_box("", LetterState.EMPTY)
         text_input.text = ""
-        if model == "22222" and not App.get_running_app().calculate_all:
+        if model == "22222" and not App.get_running_app().calculate_step:
             self.parent.remove_widget(self)
         guess_widget.process_model(model)
 
@@ -214,47 +220,62 @@ class WordleApp(App):
     connection: Connection
     word_list: List[str]
     word_index: int
+    calculate_step: int
     auto_quit: bool
-    calculate_all: bool
 
-    def __init__(self, word_list: List[str], word_index: int, connection: Connection = None, auto_quit: bool = False, calculate_all: bool = False, **kwargs):
+    def __init__(self, word_list: List[str], word_index: int, connection: Connection = None, calculate_step: int = 0, auto_quit: bool = False, **kwargs):
         super(WordleApp, self).__init__(**kwargs)
         self.connection = connection
         self.word_list = word_list
         self.word_index = word_index
+        self.calculate_step = calculate_step
         self.auto_quit = auto_quit
-        self.calculate_all = calculate_all
 
     def build(self):
         if self.connection:
-            self.guess_list_widget = GuessList(self.word_list, self.word_index, connection=self.connection)
+            try:
+                self.guess_list_widget = GuessList(self.word_list, self.word_index, connection=self.connection)
+            except Exception as e:
+                print(e)
         else:
             self.guess_list_widget = GuessList(self.word_list, self.word_index)
         return self.guess_list_widget
 
     def restart(self):
-        self.word_index += 1
-        if self.word_list == len(self.word_list):
-            if self.auto_quit:
-                self.stop()
-        else:
-            self.connection.send(self.guess_list_widget.current_guess)
+        self.word_index += self.calculate_step
+        if self.calculate_step == 0 or self.word_index >= len(self.word_list):
+            list_of_guesses: List[str] = []
             for line in self.guess_list_widget.guess_list:
+                current_guess: str = ""
                 for letter in line.letters:
+                    current_guess += letter.text
+                if current_guess != '':
+                    list_of_guesses.append(current_guess)
+            self.connection.send(list_of_guesses)
+            self.stop()
+        else:
+            list_of_guesses: List[str] = []
+            for line in self.guess_list_widget.guess_list:
+                current_guess: str = ""
+                for letter in line.letters:
+                    current_guess += letter.text
                     letter.update_box('', LetterState.EMPTY)
+                if current_guess != '':
+                    list_of_guesses.append(current_guess)
+            self.connection.send(list_of_guesses)
             self.guess_list_widget.correct_word = self.word_list[self.word_index]
             self.guess_list_widget.current_guess = 0
             if self.guess_list_widget.connection:
                 Clock.schedule_once(self.guess_list_widget.receive_data, 1 / TICKS_PER_SECOND)
 
 
-def remote_start_app(word_list: List[str], connection: Connection, auto_quit: bool = False):
+def remote_start_app(word_list: List[str], connection: Connection, auto_quit: bool = False, **kwargs):
     app = WordleApp(word_list, random.randint(0, len(word_list)), connection=connection, auto_quit=auto_quit)
     app.run()
 
 
-def remote_start_app_with_word(word_list: List[str], word_index: int, connection: Connection, auto_quit: bool = False, calculate_all: bool = False):
-    app = WordleApp(word_list, word_index, connection=connection, auto_quit=auto_quit, calculate_all=calculate_all)
+def remote_start_app_with_word(word_list: List[str], word_index: int, connection: Connection, calculate_step: int = 0, auto_quit: bool = False):
+    app = WordleApp(word_list, word_index, connection=connection, calculate_step=calculate_step, auto_quit=auto_quit)
     app.run()
 
 
