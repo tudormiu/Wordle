@@ -126,7 +126,7 @@ def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = T
                 lista_cuvinte.pop(i)
 
         lista_second_guesses = []
-        with open("lista_second_guesses.txt") as lista_guesses:
+        with open("lista_second_guesses_2.txt") as lista_guesses:
             for line in lista_guesses:
                 lista_second_guesses.append(line.rstrip())
 
@@ -162,6 +162,12 @@ def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = T
 
         for nou_candidat in lista_candidati:
             ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte)
+
+            #URMATOARELE 2 LINII REPREZINTA OPTIMIZAREA NUMITA algoritm2
+            if lungime_cuvinte:
+                if nou_candidat in lista_cuvinte:
+                    ev += (1 / lungime_cuvinte)
+
             #ct_num = nou_candidat in lista_cuvinte
             if ev > max:
                 max = ev
@@ -203,6 +209,12 @@ def calculate_second_word():
 
         for nou_candidat in lista_candidati:
             ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte_second_guess)
+
+            # URMATOARELE 2 LINII REPREZINTA OPTIMIZAREA NUMITA algoritm2
+            if lungime_cuvinte:
+                if nou_candidat in lista_cuvinte:
+                    ev += (1 / lungime_cuvinte)
+
             if ev > max:
                 max = ev
                 ultimul_guess = nou_candidat
@@ -213,7 +225,7 @@ def calculate_second_word():
         lista_rezultate.append(ultimul_guess)
         print(current_model, ultimul_guess)
 
-    lista_second_guesses = open("lista_second_guesses.txt", "a")
+    lista_second_guesses = open("lista_second_guesses_2.txt", "a")
     for i in range (243):
         lista_second_guesses.write(lista_rezultate[i])
     lista_second_guesses.close()
