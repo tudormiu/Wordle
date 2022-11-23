@@ -17,6 +17,17 @@ def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta, lungime
     return exp_score
     #una din functiile pe care nu le inteleg din codul lui Miu
 ```
-    
+
+## Jucator 
+
+aici urm sa explic cum func jucatorul, dupa ce inteleg si eu
+
+## Joc 
+
+la fel ca mai sus
+
+## Statistici 
+
+ba azi am mers la sala si cand impiangeam la piept mi a venit rau si de atunci ma doare capul
     
     
