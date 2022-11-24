@@ -1,10 +1,14 @@
 #  -Wordle Cracker-
 Proiect realizat de: 
 
-    - Deaconescu Mario
-    - Miu Tudor
-    - Berbece David
+    - Deaconescu Mario, grupa 151
+    - Miu Tudor, grupa 151
+    - Berbece David,grupa 151
 
+## Statistici 
+
+   Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este:
+    
 ## Instalare 
 
  - Pull din GitHub
@@ -26,10 +30,5 @@ Proiect realizat de:
 la fel ca mai sus
 
 ## Comunicare
-
-
-## Statistici 
-
-ba azi am mers la sala si cand impiangeam la piept mi a venit rau si de atunci ma doare capul
     
     
