@@ -2,6 +2,9 @@ import copy
 from multiprocessing.dummy.connection import Connection
 from typing import List
 
+ruleaza_algoritmul_1 = 0
+ruleaza_algoritmul_2 = 0
+ruleaza_algoritmul_3 = 1
 
 def base3base10(intrare):
     put = 1
@@ -63,13 +66,12 @@ def expected_value(candidat, numar_cuvinte, lista_cuvinte_ev):
 
 
 def aproximare_guessuri_ramase(biti_incertitudine):
-    '''Functia estimeaza pornind de la o presupunere initiala ca ar fi nevoie de aproximativ 3.75 incercari pentru a ghici
-    cuvantul. Stiind ca avem, initial, 13.5 biti de incertitudine si ca, in momentul in care raman 0, ghicim din prima si
-    cand avem un bit de incertitudine ghicim din 1,5 incercari, am calculat raportul dintre cele 2 valori si am presupus
-    (stiind ca e eronat) ca distributia lor e liniara, aproximand o constanta de 5.2 ca fiind raportul dinte
-    incertitudinea ramasa si numarul necesar de guessuri, peste ultimul guess, necesar'''
-
-    guessuri_ramase = 1 + biti_incertitudine / 5.20
+    guessuri_ramase = 0
+    putere = 1
+    coeficienti = [1 , 0.7509383846 , -0.1381286976 , -0.0227391170 , 0.0127673413 , -0.0012171694]
+    for i in coeficienti:
+        guessuri_ramase += i * putere
+        putere *= biti_incertitudine
     return guessuri_ramase
 
 
@@ -85,15 +87,6 @@ def entropie_lista(lungime_lista_cuvinte):
 
 
 def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = True):
-    # lungime = len(lista_cuvinte)
-    # for cuv in lista_cuvinte:
-    #    if expected_value(cuv, lungime) > max:
-    #        max = expected_value(cuv, lungime)
-    #        first_guess= cuv
-    #    print(round(i/11454, 2)*100 , '%')
-    #    i += 1
-    # print (first_guess)
-    # print (max)
 
     if cuvinte:
         global lista_cuvinte
@@ -156,27 +149,33 @@ def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = T
 
         lungime_cuvinte = len(lista_cuvinte)
 
-        #min = 50
-        max = 0
-        #entropie_ramasa = entropie_lista(lungime_cuvinte)
+        if ruleaza_algoritmul_3:
+            max = 50
+            entropie_ramasa = entropie_lista(lungime_cuvinte)
 
+        if ruleaza_algoritmul_1 or ruleaza_algoritmul_2:
+            max = 0
         for nou_candidat in lista_candidati:
             ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte)
 
-            #URMATOARELE 2 LINII REPREZINTA OPTIMIZAREA NUMITA algoritm2
-            if lungime_cuvinte:
-                if nou_candidat in lista_cuvinte:
-                    ev += (1 / lungime_cuvinte)
+            if ruleaza_algoritmul_2 or ruleaza_algoritmul_1:
+                if ruleaza_algoritmul_2:
+                    if lungime_cuvinte:
+                        if nou_candidat in lista_cuvinte:
+                            ev += (1 / lungime_cuvinte)
 
-            #ct_num = nou_candidat in lista_cuvinte
-            if ev > max:
-                max = ev
-                '''scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
-                if scor_asteptat < min and scor_asteptat != 0:
-                    min = scor_asteptat'''
-                ultimul_guess = nou_candidat
-            elif ev == max and nou_candidat in lista_cuvinte:
-                ultimul_guess = nou_candidat
+                if ev > max:
+                    max = ev
+                    ultimul_guess = nou_candidat
+                elif ev == max and nou_candidat in lista_cuvinte:
+                    ultimul_guess = nou_candidat
+
+            if ruleaza_algoritmul_3:
+                ct_num = nou_candidat in lista_cuvinte
+                scor_asteptat = expected_score(numar_incercare, ev, entropie_ramasa, ct_num, lungime_cuvinte)
+                if scor_asteptat < max and scor_asteptat != 0:
+                    max = scor_asteptat
+                    ultimul_guess = nou_candidat
 
         if log:
             print(lista_cuvinte)
@@ -187,6 +186,20 @@ def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = T
             ultimul_model = int(connection.recv())
         else:
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
+
+
+def calculate_first_word():
+    i = 0
+    max = 0
+    lungime = len(lista_cuvinte)
+    for cuv in lista_cuvinte:
+        if expected_value(cuv, lungime, lista_cuvinte) > max:
+            max = expected_value(cuv, lungime, lista_cuvinte)
+            first_guess = cuv
+        print(round(i / 11454, 2) * 100, '%')
+        i += 1
+    print(first_guess)
+    print(max)
 
 def calculate_second_word():
     lista_rezultate = []
@@ -210,10 +223,10 @@ def calculate_second_word():
         for nou_candidat in lista_candidati:
             ev = expected_value(nou_candidat, lungime_cuvinte, lista_cuvinte_second_guess)
 
-            # URMATOARELE 2 LINII REPREZINTA OPTIMIZAREA NUMITA algoritm2
-            if lungime_cuvinte:
-                if nou_candidat in lista_cuvinte:
-                    ev += (1 / lungime_cuvinte)
+            if ruleaza_algoritmul_2:
+                if lungime_cuvinte:
+                    if nou_candidat in lista_cuvinte:
+                        ev += (1 / lungime_cuvinte)
 
             if ev > max:
                 max = ev
@@ -245,3 +258,4 @@ if __name__ == "__main__":
 
     play()
     #calculate_second_word()
+    #calculate_first_word()
