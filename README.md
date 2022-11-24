@@ -1,30 +1,32 @@
-# Wordle
-Proiect realizat de Mario, Miu...si pana la urma si David, sper.
+#  -Wordle Cracker-
+Proiect realizat de: 
+
+    - Deaconescu Mario
+    - Miu Tudor
+    - Berbece David
 
 ## Instalare 
-Aici trb sa explic cum sa instalezi astea pe aici, dar nici eu nu stiu
-Pentru detalii suplimentare, apasati [aici](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
-## Cum functioneaza 
-Inca nu mi am dat seama, stiu cat de cat jucatorul...trb sa ma apuc sa citesc comentariile, Multumesc Miu si Mario ca mi ati scris compuneri! <3
-
-
-```python
-#aici cred ca trb sa scrie cv in Python
-def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta, lungime_cuvinte):
-    exp_score = numar_incercare * constanta / lungime_cuvinte + (1 - (constanta / lungime_cuvinte)) * (
-                numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa - ev))
-    return exp_score
-    #una din functiile pe care nu le inteleg din codul lui Miu
-```
+ - Pull din GitHub
+ - In consola se executa comanda: "pip3 install -r requirements.txt"
+ - Pentru a juca manual: "python3 joc.py"
+ - Pentru a testa jucatorul: "python3 jucator.py"
+ - pentru a juca jucatorul cu jocul: "python3 starter.py" 
 
 ## Jucator 
-
-aici urm sa explic cum func jucatorul, dupa ce inteleg si eu
+    
+   - Primul Guess:
+            dcsvcs
+   -  
+    
+    
 
 ## Joc 
 
 la fel ca mai sus
+
+## Comunicare
+
 
 ## Statistici 
 
