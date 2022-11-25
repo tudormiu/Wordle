@@ -29,6 +29,23 @@ Proiect realizat de:
 
 la fel ca mai sus
 
-## Comunicare
-    
+## Comunicare si Crearea Fisierului cu Solutii
+
+   - Aceasta este implementata in fisierul '''starter.py''' si se realizeaza cu ajutorul unui Pipe importat din modulul multiprocessing.
+   - Comanda ```connection1, connection2 = Pipe(duplex=True)``` creeaza cele 2 conexiuni de care avem nevoie pentru a realiza comunicarea intre *Joc* si *Jucator*
+   - Jocul isi alege fiecare cuvant din lista. Se creaza 2 procese, unul pentru *Joc*, iar celalalt pentru *Jucator*. Cand jucatorul termina, prin conexiunea ```connection2``` se preiau cuvintele incercate de acesta si se scriu in fisierul ```solutii2.yaml```.
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
     
