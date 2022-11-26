@@ -5,10 +5,13 @@ Proiect realizat de:
     - Miu Tudor, grupa 151
     - Berbece David, grupa 151
 
-## Statistici 
+## Statistici si Notatii
 
-   Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este:
-    
+   - Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este: 3.9889121704208135
+   - Codificarea pentru cuvintele incercate este:
+        - 2, daca litera apare in cuvant, pe pozitia potrivita. (casuta este verde)
+        - 1, daca litera apare in cuvant, dar pe alta pozitie. (casuta este portocalie)
+        - 0, daca litara nu se gaseste in cuvant. (casuta este neagra)
 ## Instalare 
 
  - Pull din GitHub
@@ -18,10 +21,14 @@ Proiect realizat de:
  - pentru a juca jucatorul cu jocul: ```python3 starter.py```
 
 ## Jucator 
-    
-   - Primul Guess:
-            dcsvcs
-   -  
+
+   - Codificarea este formata doar cu cifrele 0,1 si 2. Asadar, modelele sunt numere scrise in baza 3. In program, aceste numere sunt transformate in baza 10, in scopul crearii unui vector de frecventa.
+   - Pentru determinarea guess-ului cu cea mai mare entropie, vom folosi 3 liste:
+      - lista cu cele 11454 de cuvinte, care nu se modifica pe parcursul rularii
+      - lista cu toate numerele de 3 cifre scrise in baza 3
+      - lista de cuvinte care se actualizeaza mereu in functie de modelul furnizat de joc
+   - Algoritmul parcurge, pe rand, toate cuvintele din lista cea mare (presupunem ca cuvantul "i" este guess-ul cautat). Apoi, pentru fiecare cuvand se parcurge lista de modele(modelul "j"), iar pentru fiecare model se parcurge lista de cuvinte ramase. Astfel, se numara de cate ori cuvantul "i" poate avea modelul "j" in lista de cuvinte care se actualizeaza dinamic. Cu aceste informatii, putem calcula entropia pentru fiecare cuvant din lista cea mare, iar cuvantul cu entropia maxima va fi guess-ul ales.
+  
     
     
 
