@@ -1,5 +1,7 @@
 #                                                           -Wordle Cracker-
 <p><img align="center" src="https://github.com/tudormiu/Wordle/blob/26cf51baf4c94ecdf8beb8b28dcafb77f1977609/ezgif.com-gif-maker.gif" width="900" height="600" /></p>
+sursa video -> https://www.youtube.com/watch?v=dQw4w9WgXcQ.
+
 Proiect realizat de: 
 
     - Deaconescu Mario, grupa 151
