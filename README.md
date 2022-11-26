@@ -35,15 +35,15 @@ Proiect realizat de:
    - Pentru eficinta din punct de vedere al timpului de executare, in fisierul ```lista_second_guesses.txt```, am precalculat si al doilea guess in functie de orice model obtinut in urma introducerii cuvantului "TAREI". 
 
 ## Joc 
-
+     
    - Crearea jocului sta la baza mai multor clase in care sunt definite functiile necesare pentru colorarea casutelor, crearea liniilor, initializare, restartare, etc... Acestea sunt:
-     -  ```class WordleApp(App)```
+     -  ```python class WordleApp(App)```
      -  ```class InputBox(BoxLayout)```
-     -  ```GuessList(AnchorLayout)```
-     -  ```GuessLine(BoxLayout)```
-     -  ```LetterBox(Button)```
+     -  ```class GuessList(AnchorLayout)```
+     -  ```class GuessLine(BoxLayout)```
+     -  ```class LetterBox(Button)```
      -  ```class LetterState(Enum)```
-   - Prima data se construieste 2 chenare, unul mare si cel in care se scrie, de la tastatura, input-ul. Mai apoi, in chenarul mare, se creaza 6 linii, iar in fiecare linie se construiesc 5 casuse, pentru cele 5 litere.
+   - Prima data se construiesc 2 chenare, unul mare si cel in care se scrie, de la tastatura, input-ul. Mai apoi, in chenarul mare, se creaza 6 linii, iar in fiecare linie se construiesc 5 casute, pentru cele 5 litere.
 
 ## Comunicare si Crearea Fisierului cu Solutii
 
