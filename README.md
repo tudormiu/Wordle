@@ -34,6 +34,11 @@ la fel ca mai sus
    - Aceasta este implementata in fisierul '''starter.py''' si se realizeaza cu ajutorul unui Pipe importat din modulul multiprocessing.
    - Comanda ```connection1, connection2 = Pipe(duplex=True)``` creeaza cele 2 conexiuni de care avem nevoie pentru a realiza comunicarea intre *Joc* si *Jucator*
    - Jocul isi alege fiecare cuvant din lista. Se creaza 2 procese, unul pentru *Joc*, iar celalalt pentru *Jucator*. Cand jucatorul termina, prin conexiunea ```connection2``` se preiau cuvintele incercate de acesta si se scriu in fisierul ```solutii2.yaml```.
+   - Pentru folosirea eficienta a programurul se va folosi un parser de argumente. Argumentele sunt: 
+       -  ```--threads``` care contine numarul de thread-uri.
+       - ```--all``` care daca este setat, atunci pasul cu care sarim cuvinte e egal cu numarul de thread-uri.
+       - ```manual``` care daca este setat, atunci se alege, manual, un singur cuvant din lista.
+   - De asemenea, pentru a calcula toate cuvintele, vom folosi si un ThreadPool care sa aloce in mod eficient procesele numarului de thread-uri. Functia care calculeaza cuvintele va fi pornita pe fiecare thread, alaturi de o lista cu parametrii.
    
    
    
