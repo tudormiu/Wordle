@@ -1,5 +1,5 @@
-#  -Wordle Cracker-
-<p><img align="right" src="" width="500" height="320" /></p>
+#                                                           -Wordle Cracker-
+<p><img align="center" src="https://github.com/tudormiu/Wordle/blob/26cf51baf4c94ecdf8beb8b28dcafb77f1977609/ezgif.com-gif-maker.gif" width="900" height="600" /></p>
 Proiect realizat de: 
 
     - Deaconescu Mario, grupa 151
@@ -54,17 +54,3 @@ Proiect realizat de:
        - ```manual``` care daca este setat, atunci se alege, manual, un singur cuvant din lista.
    - De asemenea, pentru a calcula toate cuvintele, vom folosi si un ThreadPool care sa aloce in mod eficient procesele numarului de thread-uri. Functia care calculeaza cuvintele va fi pornita pe fiecare thread, alaturi de o lista cu parametrii.
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-    
