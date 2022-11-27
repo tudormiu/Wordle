@@ -8,6 +8,8 @@ Proiect realizat de:
     - Miu Tudor, grupa 151
     - Berbece David, grupa 151
 
+$$\sqrt{2}$$
+
 ## Statistici si Notatii
 
    - Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este: 3.9889121704208135
