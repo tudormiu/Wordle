@@ -8,7 +8,6 @@ Proiect realizat de:
     - Miu Tudor, grupa 151
     - Berbece David, grupa 151
 
-$$\sqrt{2}$$
 
 ## Statistici si Notatii
 
