@@ -11,7 +11,10 @@ Proiect realizat de:
 
 ## Statistici si Notatii
 
-   - Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este: 3.9889121704208135
+   - Numărul mediu de încercări pentru ghicirea tuturor cuvintelor pe care l-am obtinut este: 
+        - Utilizand algoritmul 1: 3.989610616378558
+        - Utilizand algoritmul 2: <span style="color: green"> 3.9889121704208135 <span>
+        - Utilizand algoritmul 3: 3.9922297887200977
    - Codificarea pentru cuvintele incercate este:
         - 2, daca litera apare in cuvant, pe pozitia potrivita. (casuta este verde)
         - 1, daca litera apare in cuvant, dar pe alta pozitie. (casuta este portocalie)

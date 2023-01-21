@@ -2,10 +2,21 @@ import copy
 from multiprocessing.dummy.connection import Connection
 from typing import List
 
+# Selectati algoritmul dorit. Algoritmul care obtine cel mai bun scor este algoritmul 2
 ruleaza_algoritmul_1 = 0
 ruleaza_algoritmul_2 = 0
-ruleaza_algoritmul_3 = 1
+ruleaza_algoritmul_3 = 0
+algoritmul_ales = 2
+if algoritmul_ales == 1:
+    ruleaza_algoritmul_1 = 1
+elif algoritmul_ales == 2:
+    ruleaza_algoritmul_2 = 1
+else:
+    ruleaza_algoritmul_3 = 1
 
+#Programul salveaza in "lista_second_guesses" al doilea guess in functie de modelul obtinut prin utilizarea
+# primului guess. Ele sunt salvate pe pozitia corespunzatoare traducerii in baza 10 a modelului, asa ca utilizam
+# aceasta functie pentru a converti modelel primite in baza 10
 def base3base10(intrare):
     put = 1
     rez = 0
@@ -17,7 +28,8 @@ def base3base10(intrare):
 
     return rez
 
-
+# functia check verifica daca un cuvant ar putea sa fie, in continuare, cel corect, considerand informatiile
+#primite la pasul anterior.
 def check(cuvant, model, candidat):
     poz = 4
 
@@ -33,7 +45,7 @@ def check(cuvant, model, candidat):
 
     return 1
 
-
+#functia pattern genereaza modelul pe care l-ar genera si jocul, considerant "cuvant" ca fiind raspunsul corect
 def pattern(candidat, cuvant):
     pat = 0
     putere = 1
@@ -48,7 +60,7 @@ def pattern(candidat, cuvant):
 
     return pat
 
-
+#functia calculeaza ce e.v. da un cuvant candidat
 def expected_value(candidat, numar_cuvinte, lista_cuvinte_ev):
     s = 0
     frecventa = [0] * 243
@@ -64,7 +76,9 @@ def expected_value(candidat, numar_cuvinte, lista_cuvinte_ev):
 
     return s
 
-
+#aproximare guessuri ramase este centrul algoritmului 3. Utilizand 500 de puncte de date obtinute cu algoritmul 2,
+#am folosit un soft online pt a genera o regresie. Functia de gradul 5 obtinuta determina un numar asteptat de
+#incercari ramase pana la obtinerea raspunsului corect, fiindu-i data incertitudinea ramasa
 def aproximare_guessuri_ramase(biti_incertitudine):
     guessuri_ramase = 0
     putere = 1
@@ -74,18 +88,20 @@ def aproximare_guessuri_ramase(biti_incertitudine):
         putere *= biti_incertitudine
     return guessuri_ramase
 
-
+#expected_score calculeaza scorul pe care algoritmul 3 determina ca un cuvant ar trebui sa il obtina
 def expected_score(numar_incercare, ev, incertitudine_ramasa, constanta, lungime_cuvinte):
     exp_score = numar_incercare * constanta / lungime_cuvinte + (1 - (constanta / lungime_cuvinte)) * (
                 numar_incercare + aproximare_guessuri_ramase(incertitudine_ramasa - ev))
     return exp_score
 
 
+#entropie lista calculeaza cata incertitudine mai exista in lista de cuvinte
 def entropie_lista(lungime_lista_cuvinte):
     import math
     return math.log2(lungime_lista_cuvinte)
 
 
+#play e functia care rezolva jocul
 def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = True):
 
     if cuvinte:
@@ -188,6 +204,7 @@ def play(cuvinte: List[str] = None, connection: Connection = None, log: bool = T
             ultimul_model = int(input("Introduceti modelul obtinut prin utilizarea guessului de mai sus:"))
 
 
+#functia caluleaza primul cuvant (TAREI). Fupa calcularea lui, nu mai e folosita niciodata
 def calculate_first_word():
     i = 0
     max = 0
@@ -201,6 +218,7 @@ def calculate_first_word():
     print(first_guess)
     print(max)
 
+#functia calculeaza al doilea guess. Dupa calcularea listei de second guesses, ea nu mai e folosita.
 def calculate_second_word():
     lista_rezultate = []
     with open("cuvinte_wordle.txt") as f_cuvinte:
