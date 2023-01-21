@@ -33,7 +33,7 @@ Proiect realizat de:
       - lista de cuvinte care se actualizeaza mereu in functie de modelul furnizat de joc
    - Algoritmul parcurge, pe rand, toate cuvintele din lista cea mare (presupunem ca cuvantul "i" este guess-ul cautat). Apoi, pentru fiecare cuvand se parcurge lista de modele(modelul "j"), iar pentru fiecare model se parcurge lista de cuvinte ramase. Astfel, se numara de cate ori cuvantul "i" poate avea modelul "j" in lista de cuvinte care se actualizeaza dinamic. Cu aceste informatii, putem calcula entropia pentru fiecare cuvant din lista cea mare, iar cuvantul cu entropia maxima va fi guess-ul ales.
    - Primul guess pe care l-am obtinut este "TAREI" cu entropie 6.413805505806506
-   - Pentru eficinta din punct de vedere al timpului de executare, in fisierul ```lista_second_guesses.txt```, am precalculat si al doilea guess in functie de orice model obtinut in urma introducerii cuvantului "TAREI". 
+   - Pentru eficienta din punct de vedere al timpului de executare, in fisierul ```lista_second_guesses.txt```, am precalculat si al doilea guess in functie de orice model obtinut in urma introducerii cuvantului "TAREI". 
 
 ## Joc 
      
